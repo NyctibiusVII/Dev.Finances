@@ -1,0 +1,120 @@
+/* Header */
+header {
+    background: var(--dark-green);
+
+    padding: 2rem 0 12rem;
+    text-align: center;
+}
+#logo {
+    color: white;
+    font-weight: 100;
+}
+
+
+
+/* Titles */
+h2 {
+    color: var(--dark-blue);
+    font-weight: normal; /* = 400 */
+
+    margin: 3.2rem 0 0.8rem;
+}
+
+
+
+/* Balance */
+#balance {
+    margin-top: -8rem;
+}
+#balance h2 {
+    color: white;
+    margin-top: 0;
+}
+
+
+
+/* Cards */
+.card {
+    color: var(--dark-blue);
+    background: white;
+
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+
+    border-radius: 0.25rem;
+    -webkit-border-radius: 0.25rem;
+    -moz-border-radius: 0.25rem;
+    -ms-border-radius: 0.25rem;
+    -o-border-radius: 0.25rem;
+}
+.card h3 {
+    font-weight: normal;
+    font-size: 1rem;
+}
+.card p {
+    font-weight: normal;
+    font-size: 2rem;
+    line-height: 3rem;
+
+    margin-top: 1rem;
+}
+.card.total {
+    color: white;
+    background: var(--light-green);
+}
+
+
+
+/* Table */
+#data-table {
+    width: 100%;
+    color: var(--light-blue);
+}
+table thead tr th:first-child,
+table tbody tr td:first-child { /*1°Filho*/
+    border-radius: 0.25rem 0 0 0.25rem;
+    -webkit-border-radius: 0.25rem 0 0 0.25rem;
+    -moz-border-radius: 0.25rem 0 0 0.25rem;
+    -ms-border-radius: 0.25rem 0 0 0.25rem;
+    -o-border-radius: 0.25rem 0 0 0.25rem;
+}
+table thead th {
+    background: white;
+
+    font-weight: normal;
+    padding: 1rem 2rem;
+
+    text-align: left;
+}
+table tbody tr {
+    opacity: 0.7;
+}
+table tbody tr:hover {
+    opacity: 1;
+}
+table tbody td {
+    background: white;
+    border-spacing: 0 0.5rem; /* Vertical | Horizontal */
+
+    padding: 1rem 2rem;
+}
+td.description {
+    color: var(--dark-blue);
+}
+td.income {
+    color: var(--money-green);
+}
+td.expense {
+    color: var(--money-red);
+}
+
+
+
+/* Footer */
+footer {
+    color: var(--dark-blue);
+    opacity: 0.6;
+
+    padding: 4rem 0 2rem;
+    text-align: center;
+}

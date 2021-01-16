@@ -1,0 +1,27 @@
+/* Global */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+:root {
+    --background: #f0f2f5;
+
+    --light-green: #49aa26;
+    --dark-green: #2d4a22;
+
+    --light-blue: #969cb3;
+    --dark-blue: #363f5f;
+
+    --money-green: #12a454;
+    --money-red: #e92929;
+}
+body {
+    background: var(--background);
+    font-family: 'Poppins', sans-serif;
+}
+
+.container {
+    width: min(90vw, 800px);
+    margin: auto;
+}
