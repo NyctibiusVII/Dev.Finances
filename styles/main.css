@@ -6,19 +6,53 @@
 }
 :root {
     --background: #f0f2f5;
+    --background-modal: #f0f2f5;
 
-    --light-green: #49aa26;
+    --link-light-green: #3dd705;
+    /*--link-normal-green: #000;*/
+    --link-dark-green: #49aa26;
+
+
+    --light-green: #3dd705;
+    --normal-green: #49aa26;
     --dark-green: #2d4a22;
 
+    /*--light-red: #000;*/
+    --normal-red: #e92929;
+    /*--dark-red: #000;*/
+
     --light-blue: #969cb3;
+    /*--normal-blue: #000;*/
     --dark-blue: #363f5f;
+
+    --green-syphrao: #2ECC71;
 
     --money-green: #12a454;
     --money-red: #e92929;
+
+    --color-modal-overlay: rgba(0, 0, 0, 0.7);
 }
 body {
     background: var(--background);
     font-family: 'Poppins', sans-serif;
+}
+html {
+    font-size: 93.75%; /*15px*/
+}
+
+.sr-only {
+    width: 1px;
+    height: 1px;
+
+    border-width: 0;
+
+    margin: -1px;
+    padding: 0;
+    position: absolute;
+
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
 }
 
 .container {
