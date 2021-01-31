@@ -33,21 +33,21 @@
                     <span>Entradas</span>
                     <img src="./assets/income.svg" alt="Imagem de entradas">
                 </h3>
-                <p>R$ 0,00</p>
+                <p id="incomeDisplay">R$ 0,00</p>
             </div>
             <div class="card">
                 <h3>
                     <span>Saídas</span>
                     <img src="./assets/expense.svg" alt="Imagem de saídas">
                 </h3>
-                <p>R$ 0,00</p>
+                <p id="expenseDisplay">R$ 0,00</p>
             </div>
             <div class="card total">
                 <h3>
                     <span>Total</span>
                     <img src="./assets/total.svg" alt="Imagem de total">
                 </h3>
-                <p>R$ 0,00</p>
+                <p id="totalDisplay">R$ 0,00</p>
             </div>
         </section>
 
@@ -66,22 +66,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="description">Final de 2020</td>
-                        <td class="income">+ R$ 2.264,44</td>
-                        <td class="date">14/12/2020</td>
-                        <td>
-                            <img src="./assets/thumbtack.svg" alt="Fixado">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="description">Conta de luz</td>
-                        <td class="expense">- R$ 127,83</td>
-                        <td class="date">19/01/2021</td>
-                        <td>
-                            <img src="./assets/minus.svg" alt="Remover Transação">
-                        </td>
-                    </tr>
                 </tbody>
             </table>
         </section>
@@ -92,7 +76,7 @@
             <div id="form">
                 <h2>Nova Transação</h2>
 
-                <form action="">
+                <form action="" onsubmit="Form.submit(event)">
                     <div class="input-group">
                         <label for="description" class="sr-only">Descrição</label>
                         <input type="text" id="description" name="description" placeholder="Description">
@@ -120,23 +104,7 @@
     </div>
 
     <footer><small>© 2021 - dev.finance$</small></footer>
-    
-    <script>
-        const Modal = {
-            open(){
-                document
-                    .querySelector(".modal-overlay")
-                    .classList
-                    .add("active")
-            },
-            close(){
-                document
-                    .querySelector(".modal-overlay")
-                    .classList
-                    .remove("active")
-            }
-        }
-    </script>
-    <!-- <link rel="javascript" href="./scripts/index.js" type="text/javascript"/> -->
+
+    <script src="./scripts/index.js" type="text/javascript"></script>
 </body>
 </html>
