@@ -1,5 +1,7 @@
 /* Global */
-* {
+*,
+*:before,
+*:after{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -8,29 +10,32 @@
     --background: #f0f2f5;
     --background-modal: #f0f2f5;
 
-    --link-light-green: #3dd705;
+    --link-light-green: #71D59A;
     /*--link-normal-green: #000;*/
-    --link-dark-green: #49aa26;
+    --link-dark-green: #239954;
 
 
-    --light-green: #3dd705;
-    --normal-green: #49aa26;
-    --dark-green: #2d4a22;
+    --light-green: #71D59A;
+    --normal-green: #2ECC71;
+    --dark-green: #294D38;
 
-    /*--light-red: #000;*/
-    --normal-red: #e92929;
-    /*--dark-red: #000;*/
+    --light-red: #EC7171;
+    --normal-red: #E83F5B;
+    --dark-red: #693232;
 
     --light-blue: #969cb3;
     /*--normal-blue: #000;*/
     --dark-blue: #363f5f;
 
-    --green-syphrao: #2ECC71;
+    --light-green-syphrao: #71D59A;
+    --normal-green-syphrao: #2ECC71;
+    --dark-green-syphrao: #294D38;
 
     --money-green: #12a454;
     --money-red: #e92929;
 
     --color-modal-overlay: rgba(0, 0, 0, 0.7);
+    --shadow: #999;
 }
 body {
     background: var(--background);
@@ -57,5 +62,5 @@ html {
 
 .container {
     width: min(90vw, 800px);
-    margin: auto;
+    margin: 3rem auto 0;
 }
