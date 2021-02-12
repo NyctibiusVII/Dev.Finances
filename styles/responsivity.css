@@ -8,4 +8,17 @@
         /*ou grid-template-columns: 1fr 1fr 1fr;*/
         gap: 2rem;/*Espaçamento entre ...*/
     }
+    div#toast {
+        font-size: 14px;
+    }
+    .float-button {
+        bottom: 40px;
+        right: 40px;
+    }
+}
+
+@media (min-width: 400px) {
+    div#toast {
+        max-width: 50px;
+    }
 }
