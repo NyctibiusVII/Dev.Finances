@@ -13,6 +13,29 @@ const Modal = {
     }
 }
 
+const CardColor = {
+    positive() {
+        document
+            .querySelector(".card.total")
+            .classList
+            .remove("negative")
+        document
+            .querySelector(".card.total")
+            .classList
+            .add("positive")
+    },
+    negative() {
+        document
+            .querySelector(".card.total")
+            .classList
+            .remove("positive")
+        document
+            .querySelector(".card.total")
+            .classList
+            .add("negative")
+    }
+}
+
 const Storage = {
     get() {
         return JSON.parse(localStorage.getItem("dev.finances:transactions")) || []
@@ -76,7 +99,7 @@ const DOM = {
         <td class="${CSSclass}">${amount}</td>
         <td class="date">${transactions.date}</td>
         <td>
-            <img onclick="Transaction.remove(${index})" src="./assets/minus.svg" alt="Remover Transação">
+            <img onclick="Transaction.remove(${index})" src="./assets/minus.svg" class="remove" alt="Remover Transação">
         </td>
         `
         return html
@@ -91,6 +114,17 @@ const DOM = {
         document
             .querySelector("#totalDisplay")
             .innerHTML = Utils.formatCurrency(Transaction.total())
+    },
+    totalCardColor(){
+        if (Transaction.total() < 0) {
+            // - Negativo
+            console.info("Seu Valor Total Esta Negativo: " + Utils.formatSimple(Transaction.total()))
+            CardColor.negative()
+        } else {
+            // - Positivo
+            console.info("Seu Valor Total Esta Positivo: " + Utils.formatSimple(Transaction.total()))
+            CardColor.positive()
+        }
     },
     clearTransactions(){
         DOM.transactionsContainer.innerHTML = ""
@@ -111,8 +145,20 @@ const Utils = {
         return signal + value
     },
     formatAmount(value) {
-        //return value = Number(value) * 100
-        return value = Number(value.replace(/\,\./g, "")) * 100
+        value = value * 100
+        return Math.round(value)
+    },
+    formatSimple(value){
+        const signal = Number(value) < 0 ? "- " : "+ "
+
+        value = String(value).replace(/\D/g, "")
+        value = Number(value) / 100
+        value = value.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+        })
+
+        return signal + value
     },
     formatDate(date) {
         const splittedDate = date.split("-")
@@ -169,7 +215,9 @@ const Form = {
 
             Modal.close()                           // Fecha modal
         } catch (error) {
-            alert(error.message)
+            console.warn(error.message)
+            toastError(error.message)
+            //alert(error.message)
         }
     }
 }
@@ -182,7 +230,8 @@ const App = {
          ou ↓ */
         Transaction.all.forEach(DOM.addTransaction)
 
-        DOM.updateBalance() // Atualiza cards
+        DOM.updateBalance()  // Atualiza o valor dos cards
+        DOM.totalCardColor() // Atualiza a cor do card 'total'
 
         Storage.set(Transaction.all)
     },
@@ -192,3 +241,20 @@ const App = {
     }
 }
 App.init()
+
+
+
+function toastError(message = "ERRO!") {
+    /*let a = document.querySelector("???").innerHTML = `
+    <div id="toast">
+    <div class="img">Icon</div>
+    <div class="description">${message}</div>
+    </div>`*/
+
+    const toastId = document.querySelector("#toast")
+    toastId.className = "show"
+
+    setTimeout(() => {
+        toastId.className = toastId.className.replace("show", "")
+    }, 5000)
+}
