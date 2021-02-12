@@ -2,7 +2,7 @@
 header {
     background: var(--dark-green);
 
-    padding: 2rem 0 12rem;
+    padding: 2rem 0 11rem;
     text-align: center;
 }
 #logo {
@@ -134,9 +134,13 @@ button:hover {
 }
 .card.total {
     color: white;
+}
+.card.total.positive {
     background: var(--normal-green);
 }
-
+.card.total.negative {
+    background: var(--normal-red);
+}
 
 
 /* Table */
@@ -194,6 +198,12 @@ td.income {
 }
 td.expense {
     color: var(--money-red);
+}
+
+
+
+img.remove {
+    cursor: pointer;
 }
 
 
