@@ -1,0 +1,35 @@
+.float-button {
+    color: white;
+    background-color: var(--dark-green);
+    box-shadow: 2px 2px 3px var(--shadow);
+
+    text-align: center;
+
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 20px;
+    right: 20px;
+
+    border-radius: 50px;
+    -webkit-border-radius: 50px;
+    -moz-border-radius: 50px;
+    -ms-border-radius: 50px;
+    -o-border-radius: 50px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 998;
+}
+.float-button:hover {
+    background: var(--normal-green);
+
+    transition: all 0.3s;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -ms-transition: all 0.3s;
+    -o-transition: all 0.3s;
+}
+
