@@ -1,0 +1,29 @@
+/*  ::-webkit-scrollbar              { /* 1 *-/ }  */
+/*  ::-webkit-scrollbar-button       { /* 2 *-/ }  */
+/*  ::-webkit-scrollbar-track        { /* 3 *-/ }  */
+/*  ::-webkit-scrollbar-track-piece  { /* 4 *-/ }  */
+/*  ::-webkit-scrollbar-thumb        { /* 5 *-/ }  */
+/*  ::-webkit-scrollbar-corner       { /* 6 *-/ }  */
+/*  ::-webkit-resizer                { /* 7 *-/ }  */
+
+
+
+/* 1 */
+::-webkit-scrollbar {
+    width: 7px;
+}
+::-webkit-scrollbar:horizontal {
+    height: 7px;
+}
+::-webkit-scrollbar,
+::-webkit-scrollbar:horizontal {
+    background: var(--background);   /*default: #F4F4F4*/
+}
+/* 5 */
+::-webkit-scrollbar-thumb {
+    background: var(--light-green);   /*default: #dad7d7*/
+}
+/* 6 */
+::-webkit-scrollbar-corner {
+    background: var(--background);
+}
