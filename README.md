@@ -24,7 +24,9 @@
 Projeto desenvolvido para administrar melhor ganhos e gastos. Projeto realizado na Maratona Discover @Rocketseat.
 
 #### Funcionalidades
-* Site para administrar ganhos e gastos
+* Site para administrar ganhos e gastos (controle financeiro)
+* Cadastro e exclusão de transações
+* Visualização do saldo de entrada e saída.
 * Float Button
 * Scrollbar personalizado
 * Toast de erro - (Modal)
