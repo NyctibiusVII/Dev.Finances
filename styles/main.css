@@ -62,5 +62,5 @@ html {
 
 .container {
     width: min(90vw, 800px);
-    margin: 3rem auto 0;
+    margin: -7rem auto 0;
 }

@@ -1,35 +1,13 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 
 <head>
     <meta charset="utf-8">
     <meta name="language" content="pt-BR">
     <title>Dev.Finance$</title>
-    <meta name="description" content="#MaratonaDiscover com a @Rocketseat, projeto dev.finance 💲💲💲">
-    <meta name="robots" content="all">
-    <meta name="rating" content="general">
-    <meta name="distribution" content="global">
-    <meta name="author" content="Matheus Vidigal - (NyctibiusVII)">
-    <meta name="creator" content="Matheus Vidigal - (NyctibiusVII)">
-    <meta name="keywords" content="HTML, CSS, JavaScript, Financias, Organize seu dinheiro, Dinheiro, Rocketseat, MaratonaDiscover">
-
-    <meta property="og:type" content="page">
-    <meta property="og:url" content="https://dev-finances.vercel.app/">
-    <meta property="og:locale" content="pt-BR">
-    <meta property="og:title" content="Dev.Finances">
-    <meta property="og:site_name" content="Dev.Finance$">
-    <meta property="og:image" content="">
-    <meta property="og:description" content="#MaratonaDiscover com a @Rocketseat, projeto dev.finance 💲💲💲">
-
-    <meta property="article:author" content="Matheus Vidigal - (NyctibiusVII)">
-
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@Dev.Finances">
-    <meta name="twitter:title" content="Dev.Finances">
-    <meta name="twitter:creator" content="@NyctibiusVII">
-    <meta name="twitter:description" content="#MaratonaDiscover com a @Rocketseat, projeto dev.finance 💲💲💲">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta http-equiv="content-language" content="pt-BR">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -41,13 +19,13 @@
     <link rel="stylesheet" href="./styles/index.css">
     <link rel="stylesheet" href="./styles/modal.css">
     <link rel="stylesheet" href="./styles/form-modal.css">
-    <link rel="stylesheet" href="./styles/float-button.css">
+    <link rel="stylesheet" href="./styles/add-transaction-button.css">
     <link rel="stylesheet" href="./styles/scrollbar.css">
     <link rel="stylesheet" href="./styles/toast.css">
     <link rel="stylesheet" href="./styles/animations.css">
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,400;0,700;1,100;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,400;0,500;0,700;1,100;1,400;1,700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -56,6 +34,17 @@
     </header>
 
     <main class="container">
+        <section id="opening-balance">
+            <h2 class="sr-only">Saldo inicial</h2>
+            <div onclick="OpeningBalanceModal.open()" class="mini-card opening-balance">
+                <h3>
+                    <img src="./assets/wallet.svg" alt="Imagem de carteira">
+                    <span>Saldo inicial</span>
+                </h3>
+                <p id="openingBalanceDisplay">R$ 0,00</p>
+            </div>
+        </section>
+
         <section id="balance">
             <h2 class="sr-only">Balanço</h2>
             <div class="card">
@@ -134,41 +123,42 @@
         </div>
     </div>
 
+    <div id="opening-balance-modal" class="modal-overlay">
+        <div class="modal">
+            <div id="form">
+                <h2>Alterar saldo inicial</h2>
+
+                <form action="" onsubmit="OpeningBalanceForm.submit(event)">
+                    <br>
+
+                    <div class="input-group">
+                        <label for="opening-balance-amount" class="sr-only">Valor</label>
+                        <input type="number" id="opening-balance-amount" name="opening-balance-amount" placeholder="0,00" step="0.01">
+                    </div>
+
+                    <small class="help-for-modal">Use o sinal - (negativo) para despesas e , (vírgula) para casas decimais</small>
+
+                    <br><br>
+                    <div class="input-group actions">
+                        <a href="#" onclick="OpeningBalanceModal.close()" class="button cancel">Cancelar</a>
+                        <button type="submit">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div id="toast">
         <div class="img"><h1>×</h1></div>
         <div class="description">Por favor, preencha todos os campos!</div>
     </div>
 
-    <a href="#" onclick="Modal.open()" class="float-button">
+    <a href="#" onclick="Modal.open()" class="add-transaction-button">
         <img src="./assets/float-plus.svg" alt="Adicionar" width="16px">
     </a>
 
     <footer><small>© 2021 - dev.finance$</small></footer>
 
     <script src="./scripts/index.js" type="text/javascript"></script>
-
-    <!-- The core Firebase JS SDK is always required and must be listed first -->
-    <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-app.js"></script>
-
-    <!-- TODO: Add SDKs for Firebase products that you want to use
-         https://firebase.google.com/docs/web/setup#available-libraries -->
-    <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-analytics.js"></script>
-
-    <script>
-      // Your web app's Firebase configuration
-      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-      var firebaseConfig = {
-        apiKey: "AIzaSyACsu8pWaxRfoj8WiRpzI2Mo2vnSn8wVns",
-        authDomain: "devfinances777.firebaseapp.com",
-        projectId: "devfinances777",
-        storageBucket: "devfinances777.appspot.com",
-        messagingSenderId: "164547638392",
-        appId: "1:164547638392:web:5324d388a389684bafa98d",
-        measurementId: "G-VWV8XMYM95"
-      };
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-      firebase.analytics();
-    </script>
 </body>
 </html>

@@ -12,6 +12,20 @@ const Modal = {
             .remove("active")
     }
 }
+const OpeningBalanceModal = {
+    open() {
+        document
+            .querySelector("#opening-balance-modal")
+            .classList
+            .add("active")
+    },
+    close() {
+        document
+            .querySelector("#opening-balance-modal")
+            .classList
+            .remove("active")
+    }
+}
 
 const CardColor = {
     positive() {
@@ -40,15 +54,26 @@ const Storage = {
     get() {
         return JSON.parse(localStorage.getItem("dev.finances:transactions")) || []
     },
+    getOpeningBalance() {
+        return localStorage.getItem("dev.finances:openingBalance") || ""
+    },
     set(transactions) {
         localStorage.setItem("dev.finances:transactions", JSON.stringify(transactions))
+    },
+    setOpeningBalance(openingBalance) {
+        localStorage.setItem("dev.finances:openingBalance", openingBalance)
     }
 }
 
 const Transaction = {
     all: Storage.get(),
     add(transaction) {
-        Transaction.all.push(transaction);
+        Transaction.all.push(transaction)
+
+        App.reload()
+    },
+    addOpeningBalance(openingBalance) {
+        Storage.setOpeningBalance(openingBalance.amount)
 
         App.reload()
     },
@@ -77,8 +102,8 @@ const Transaction = {
         })
         return expense
     },
-    total() { // Entradas menos saídas
-        return Transaction.incomes() + Transaction.expenses()
+    total() { // Entradas menos saídas mais saldo inicial
+        return Transaction.incomes() + Transaction.expenses() + Number(Storage.getOpeningBalance())
     }
 }
 
@@ -103,6 +128,14 @@ const DOM = {
         </td>
         `
         return html
+    },
+    updateOpeningBalance() {
+        document
+            .querySelector("#openingBalanceDisplay")
+            .innerHTML = Utils.formatCurrency(Storage.getOpeningBalance())
+        document
+            .querySelector("#opening-balance-amount")
+            .value = Utils.formatSimpleAmountToText(Storage.getOpeningBalance())
     },
     updateBalance() {
         document
@@ -147,6 +180,14 @@ const Utils = {
     formatAmount(value) {
         value = value * 100
         return Math.round(value)
+    },
+    formatSimpleAmountToText(value) {
+        const decimalPlace = value.slice(-2)
+        const integer = value.slice(0, -2)
+
+        const formattedAmount = `${integer}.${decimalPlace}`
+
+        return formattedAmount
     },
     formatSimple(value){
         const signal = Number(value) < 0 ? "- " : "+ "
@@ -221,6 +262,49 @@ const Form = {
         }
     }
 }
+const OpeningBalanceForm = {
+    amount: document.querySelector("input#opening-balance-amount"),
+    getValues() {
+        return {
+            amount: OpeningBalanceForm.amount.value
+        }
+    },
+    validateFields() {
+        const {amount} = OpeningBalanceForm.getValues()
+
+        if (amount.trim() === "") {
+            throw new Error("Por favor, preencha o campo!")
+        }
+    },
+    formatValues() {
+        let {amount} = OpeningBalanceForm.getValues()
+
+        amount = Utils.formatAmount(amount)
+
+        return {
+            amount
+        }
+    },
+    saveOpeningBalance(openingBalance) {
+        Transaction.addOpeningBalance(openingBalance)
+    },
+    submit(event) {
+        event.preventDefault()
+
+        try {
+            OpeningBalanceForm.validateFields()                      // Verifica campos
+            const openingBalance = OpeningBalanceForm.formatValues() // Formata valores
+            OpeningBalanceForm.saveOpeningBalance(openingBalance)    // Adiciona valores
+
+            OpeningBalanceModal.close()                              // Fecha modal
+        } catch (error) {
+            console.warn(error.message)
+            toastError(error.message)
+            //alert(error.message)
+        }
+    }
+}
+
 
 const App = {
     init() {
@@ -230,9 +314,11 @@ const App = {
          ou ↓ */
         Transaction.all.forEach(DOM.addTransaction)
 
-        DOM.updateBalance()  // Atualiza o valor dos cards
-        DOM.totalCardColor() // Atualiza a cor do card 'total'
+        DOM.updateOpeningBalance()  // Atualiza o valor do saldo inicial
+        DOM.updateBalance()         // Atualiza o valor dos cards
+        DOM.totalCardColor()        // Atualiza a cor do card 'total'
 
+        Storage.setOpeningBalance(Storage.getOpeningBalance())
         Storage.set(Transaction.all)
     },
     reload() {

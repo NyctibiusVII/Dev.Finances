@@ -18,6 +18,9 @@
 }
 
 @media (min-width: 400px) {
+    main #opening-balance {
+        justify-content: flex-end;
+    }
     div#toast {
         max-width: 50px;
     }
