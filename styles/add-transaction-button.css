@@ -1,4 +1,4 @@
-.float-button {
+.add-transaction-button {
     color: white;
     background-color: var(--dark-green);
     box-shadow: 2px 2px 3px var(--shadow);
@@ -23,7 +23,7 @@
 
     z-index: 998;
 }
-.float-button:hover {
+.add-transaction-button:hover {
     background: var(--normal-green);
 
     transition: all 0.3s;

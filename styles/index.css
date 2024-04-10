@@ -55,7 +55,7 @@ button {
 }
 button:hover {
     background: var(--light-green);
-    
+
     transition: all 0.5s;
     -webkit-transition: all 0.5s;
     -moz-transition: all 0.5s;
@@ -64,7 +64,7 @@ button:hover {
 }
 .button.cancel {
     height: 50px;
-    
+
     color: var(--normal-red);
 
     display: flex;
@@ -93,8 +93,11 @@ button:hover {
 
 
 /* Balance */
-#balance {
-    margin-top: -8rem;
+#opening-balance {
+    margin-bottom: 1.5rem;
+
+    display: flex;
+    justify-content: center;
 }
 #balance h2 {
     color: white;
@@ -104,6 +107,36 @@ button:hover {
 
 
 /* Cards */
+.mini-card {
+    width: fit-content;
+
+    background-color: #2ecc7129;
+    border: 3px solid #2ecc71;
+    color: #2ecc71;
+
+    padding: 0.5rem 1rem;
+
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    border-radius: 0.5rem;
+
+    cursor: pointer;
+}
+.mini-card h3 {
+    font-weight: 500;
+
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+.mini-card p {
+    color: #E5E5E5;
+
+    font-size: 1rem;
+    font-weight: 500;
+}
 .card {
     color: var(--dark-blue);
     background: white;
