@@ -12,6 +12,25 @@ const Modal = {
             .remove("active")
     }
 }
+const UpdateTransactionModal = {
+    open(index) {
+        document
+            .querySelector("#update-transaction-modal")
+            .classList
+            .add("active")
+        document
+            .querySelector("#update-transaction-form")
+            .setAttribute("aria-modal-index", index)
+
+        DOM.updateTransactionModal(index)
+    },
+    close() {
+        document
+            .querySelector("#update-transaction-modal")
+            .classList
+            .remove("active")
+    }
+}
 const OpeningBalanceModal = {
     open() {
         document
@@ -60,6 +79,17 @@ const Storage = {
     set(transactions) {
         localStorage.setItem("dev.finances:transactions", JSON.stringify(transactions))
     },
+    update(index, transaction) {
+        let transactionList = Transaction.all
+
+        if (transactionList) {
+            if (transactionList[index]) {
+                transactionList[index] = transaction
+            }
+        }
+
+        Transaction.set(transactionList)
+    },
     setOpeningBalance(openingBalance) {
         localStorage.setItem("dev.finances:openingBalance", openingBalance)
     }
@@ -69,6 +99,14 @@ const Transaction = {
     all: Storage.get(),
     add(transaction) {
         Transaction.all.push(transaction)
+
+        App.reload()
+    },
+    set(transactions) {
+        Storage.set(transactions)
+    },
+    update(index, transaction) {
+        Storage.update(index, transaction)
 
         App.reload()
     },
@@ -86,8 +124,10 @@ const Transaction = {
         let income = 0
 
         Transaction.all.forEach(transaction => {
-            if (transaction.amount > 0) {
-                income += transaction.amount
+            if (transaction.deposit) {
+                if (transaction.amount > 0) {
+                    income += transaction.amount
+                }
             }
         })
         return income
@@ -96,8 +136,10 @@ const Transaction = {
         let expense = 0
 
         Transaction.all.forEach(transaction => {
-            if (transaction.amount < 0) {
-                expense += transaction.amount
+            if (transaction.deposit) {
+                if (transaction.amount < 0) {
+                    expense += transaction.amount
+                }
             }
         })
         return expense
@@ -110,24 +152,46 @@ const Transaction = {
 const DOM = {
     transactionsContainer: document.querySelector("#data-table tbody"),
     addTransaction(transactions, index) {
+        const deposit = transactions.deposit ? "deposit-activated" : "deposit-not-activated"
+
         const tr = document.createElement("tr")
         tr.innerHTML = DOM.innerHTMLTransaction(transactions, index)
+        tr.classList.add(`${deposit}`)
         tr.dataset.index = index
+        // tr.onclick = () => UpdateTransactionModal.open(index)
 
         DOM.transactionsContainer.appendChild(tr)
     },
     innerHTMLTransaction(transactions, index) {
-        const CSSclass = transactions.amount > 0 ? "income":"expense"
+        const CSSclass = transactions.amount > 0 ? "income" : "expense"
         const amount = Utils.formatCurrency(transactions.amount)
+        const UpdateTransactionModal_func = `UpdateTransactionModal.open(${index})`
         const html = `
-        <td class="description">${transactions.description}</td>
-        <td class="${CSSclass}">${amount}</td>
-        <td class="date">${transactions.date}</td>
-        <td>
-            <img onclick="Transaction.remove(${index})" src="./assets/minus.svg" class="remove" alt="Remover Transação">
+        <td onClick="${UpdateTransactionModal_func}" class="description">${transactions.description}</td>
+        <td onClick="${UpdateTransactionModal_func}" class="${CSSclass}">${amount}</td>
+        <td onClick="${UpdateTransactionModal_func}" class="date">${transactions.date}</td>
+        <td onclick="Transaction.remove(${index})" class="center-item">
+            <img src="./assets/minus.svg" class="remove" alt="Remover Transação">
         </td>
         `
         return html
+    },
+    updateTransactionModal(index) {
+        const {description, amount, date, deposit} = Transaction.all[index]
+        console.log(date)
+
+        document
+            .querySelector("#update-description")
+            .value = description
+        document
+            .querySelector("#update-amount")
+            .value = Utils.formatSimpleAmountToText(String(amount))
+        document
+            .querySelector("#update-date")
+            .value = Utils.unFormatDate(date)
+        document
+            .querySelector("#update-deposit")
+            .checked = deposit
     },
     updateOpeningBalance() {
         document
@@ -204,6 +268,10 @@ const Utils = {
     formatDate(date) {
         const splittedDate = date.split("-")
         return `${splittedDate[2]}/${splittedDate[1]}/${splittedDate[0]}`
+    },
+    unFormatDate(date) {
+        const splittedDate = date.split("/")
+        return `${splittedDate[2]}-${splittedDate[1]}-${splittedDate[0]}`
     }
 }
 
@@ -211,11 +279,13 @@ const Form = {
     description: document.querySelector("input#description"),
     amount:      document.querySelector("input#amount"),
     date:        document.querySelector("input#date"),
+    deposit:     document.querySelector("input#deposit"),
     getValues() {
         return {
             description: Form.description.value,
             amount:      Form.amount.value,
-            date:        Form.date.value
+            date:        Form.date.value,
+            deposit:     Form.deposit.checked
         }
     },
     validateFields() {
@@ -226,7 +296,7 @@ const Form = {
         }
     },
     formatValues() {
-        let {description, amount, date} = Form.getValues()
+        let {description, amount, date, deposit} = Form.getValues()
 
         amount = Utils.formatAmount(amount)
         date   = Utils.formatDate(date)
@@ -234,7 +304,8 @@ const Form = {
         return {
             description,
             amount,
-            date
+            date,
+            deposit
         }
     },
     saveTransaction(transaction) {
@@ -244,6 +315,7 @@ const Form = {
         Form.description.value = ""
         Form.amount.value      = ""
         Form.date.value        = ""
+        Form.deposit.checked   = true
     },
     submit(event) {
         event.preventDefault()
@@ -259,6 +331,59 @@ const Form = {
             console.warn(error.message)
             toastError(error.message)
             //alert(error.message)
+        }
+    }
+}
+const UpdateTransactionForm = {
+    description: document.querySelector("input#update-description"),
+    amount:      document.querySelector("input#update-amount"),
+    date:        document.querySelector("input#update-date"),
+    deposit:     document.querySelector("input#update-deposit"),
+    getValues() {
+        return {
+            description: UpdateTransactionForm.description.value,
+            amount:      UpdateTransactionForm.amount.value,
+            date:        UpdateTransactionForm.date.value,
+            deposit:     UpdateTransactionForm.deposit.checked
+        }
+    },
+    validateFields() {
+        const {description, amount, date} = UpdateTransactionForm.getValues()
+
+        if (description.trim() === "" || amount.trim() === "" || date.trim() === "") {
+            throw new Error("Por favor, preencha todos os campos!")
+        }
+    },
+    formatValues() {
+        let {description, amount, date, deposit} = UpdateTransactionForm.getValues()
+
+        amount = Utils.formatAmount(amount)
+        date   = Utils.formatDate(date)
+
+        return {
+            description,
+            amount,
+            date,
+            deposit
+        }
+    },
+    saveTransaction(index, transaction) {
+        Transaction.update(index, transaction)
+    },
+    submit(event) {
+        event.preventDefault()
+        const modalIndex = document
+            .querySelector("#update-transaction-form")
+            .getAttribute("aria-modal-index")
+
+        try {
+            UpdateTransactionForm.validateFields()                         // Verifica campos
+            const transaction = UpdateTransactionForm.formatValues()       // Formata valores
+            UpdateTransactionForm.saveTransaction(modalIndex, transaction) // Adiciona valores
+            UpdateTransactionModal.close()                                 // Fecha modal
+        } catch (error) {
+            console.warn(error.message)
+            toastError(error.message)
         }
     }
 }
@@ -300,7 +425,6 @@ const OpeningBalanceForm = {
         } catch (error) {
             console.warn(error.message)
             toastError(error.message)
-            //alert(error.message)
         }
     }
 }

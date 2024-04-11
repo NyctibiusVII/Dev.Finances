@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="./styles/form-modal.css">
     <link rel="stylesheet" href="./styles/add-transaction-button.css">
     <link rel="stylesheet" href="./styles/scrollbar.css">
+    <link rel="stylesheet" href="./styles/toggle-switch.css">
     <link rel="stylesheet" href="./styles/toast.css">
     <link rel="stylesheet" href="./styles/animations.css">
 
@@ -99,7 +100,7 @@
                 <form action="" onsubmit="Form.submit(event)">
                     <div class="input-group">
                         <label for="description" class="sr-only">Descrição</label>
-                        <input type="text" id="description" name="description" placeholder="Description">
+                        <input type="text" id="description" name="description" placeholder="Descrição">
                     </div>
 
                     <div class="input-group">
@@ -114,8 +115,62 @@
                         <input type="date" id="date" name="date">
                     </div>
 
+                    <div class="input-group switch">
+                        <div class="switch-group">
+                            <div class="toggle">
+                                <input type="checkbox" id="deposit" name="deposit" checked="true">
+                            </div>
+                            <label for="deposit">Deposito</label>
+                        </div>
+
+                        <small class="help-for-modal">Se habilitado, o valor será contabilizado no sistema. Se desabilidado, este lançamento aguardará o deposito, (ativação deste item)</small>
+                    </div>
+
                     <div class="input-group actions">
                         <a href="#" onclick="Modal.close()" class="button cancel">Cancelar</a>
+                        <button type="submit">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="update-transaction-modal" class="modal-overlay">
+        <div class="modal">
+            <div id="form">
+                <h2>Atualizar Transação</h2>
+
+                <form id="update-transaction-form" action="" aria-modal-index="" onsubmit="UpdateTransactionForm.submit(event)">
+                    <div class="input-group">
+                        <label for="update-description" class="sr-only">Descrição</label>
+                        <input type="text" id="update-description" name="update-description" placeholder="Descrição">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="update-amount" class="sr-only">Valor</label>
+                        <input type="number" id="update-amount" name="update-amount" placeholder="0,00" step="0.01">
+                    </div>
+
+                    <small class="help-for-modal">Use o sinal - (negativo) para despesas e , (vírgula) para casas decimais</small>
+
+                    <div class="input-group">
+                        <label for="update-date" class="sr-only">Data</label>
+                        <input type="date" id="update-date" name="update-date">
+                    </div>
+
+                    <div class="input-group switch">
+                        <div class="switch-group">
+                            <div class="toggle">
+                                <input type="checkbox" id="update-deposit" name="update-deposit" checked="true">
+                            </div>
+                            <label for="update-deposit">Deposito</label>
+                        </div>
+
+                        <small class="help-for-modal">Se habilitado, o valor será contabilizado no sistema. Se desabilidado, este lançamento aguardará o deposito, (ativação deste item)</small>
+                    </div>
+
+                    <div class="input-group actions">
+                        <a href="#" onclick="UpdateTransactionModal.close()" class="button cancel">Cancelar</a>
                         <button type="submit">Salvar</button>
                     </div>
                 </form>

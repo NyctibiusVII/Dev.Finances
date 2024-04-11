@@ -213,9 +213,18 @@ table thead th {
 }
 table tbody tr {
     opacity: 0.7;
+    cursor: pointer;
 }
 table tbody tr:hover {
     opacity: 1;
+}
+tr.deposit-not-activated {
+    background-color: #f9f9f9;
+    box-shadow: inset 0px 0px 0px 1px rgb(232 63 91 / 50%);
+    border-radius: 0.25rem;
+}
+tr.deposit-not-activated td {
+    background-color: transparent;
 }
 table tbody td {
     background: white;
@@ -231,6 +240,11 @@ td.income {
 }
 td.expense {
     color: var(--money-red);
+}
+td.center-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 
