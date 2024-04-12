@@ -1,0 +1,87 @@
+#switch-month {
+    width: 14rem;
+
+    background-color: #296241;
+    border: 3px solid #2ecc71;
+    border-radius: 0.5rem;
+    color: #2ecc71;
+
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    overflow: hidden;
+}
+#switch-month p {
+    width: fit-content;
+
+    font-size: 1.15rem;
+    font-weight: 500;
+
+    position: absolute;
+
+    transition: none 0s ease 0s;
+}
+#switch-month p:first-of-type {
+    left: 0px;
+    opacity: 0;
+    z-index: 10;
+}
+#switch-month p:nth-of-type(2) {
+    margin: 0 auto;
+    right: -50%;
+    left: -50%;
+    opacity: 1;
+    z-index: 20;
+}
+#switch-month p:last-of-type {
+    right: 0px;
+    opacity: 0;
+    z-index: 30;
+}
+
+.switch-month-button {
+    width: 2.688rem;
+    height: 2.688rem;
+
+    background-color: transparent;
+    border-radius: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 50;
+}
+.switch-month-button:hover {
+    background-color: #296241;
+    border-color: transparent;
+}
+#switch-previous-month-button.switch-month-button:not([disabled]):hover,
+#switch-next-month-button.switch-month-button:not([disabled]):hover  {
+    background-color: #275D3E;
+    border-color: #2ECC71;
+}
+#switch-previous-month-button.switch-month-button:disabled,
+#switch-next-month-button.switch-month-button:disabled {
+    cursor: not-allowed;
+}
+.switch-month-button:disabled img {
+    opacity: 0.4;
+    z-index: 999;
+}
+
+
+#switch-previous-month-button {
+    border-right: 3px solid transparent;
+}
+
+#switch-next-month-button {
+    border-left: 3px solid transparent;
+}
+#switch-next-month-button img {
+    transform: rotate(180deg);
+}

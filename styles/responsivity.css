@@ -17,10 +17,19 @@
     }
 }
 
-@media (min-width: 400px) {
-    main #opening-balance {
-        justify-content: flex-end;
+@media (min-width: 620px) {
+    .container {
+        margin: -7rem auto 0;
     }
+    main #container-calendar-and-opening-balance {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    main #container-calendar-and-opening-balance h3#year-calendar {
+        display: inline-block;
+    }
+}
+@media (min-width: 400px) {
     div#toast {
         max-width: 50px;
     }

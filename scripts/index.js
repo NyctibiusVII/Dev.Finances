@@ -69,12 +69,116 @@ const CardColor = {
     }
 }
 
+const Calendar = {
+    months: [
+        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ],
+    activeMonth() {
+        let month = Storage.getActiveMonth()
+
+        if (!month) {
+            month = new Date().getMonth()
+            Storage.setActiveMonth(month)
+        }
+
+        return Number(month)
+    },
+    setActiveMonth(month) {
+        Storage.setActiveMonth(month)
+    },
+    switchMonth(intention) {
+        if (intention !== 'previous' && intention !== 'next') return
+
+        const activeMonth = Calendar.activeMonth()
+
+        if (intention === 'previous') {
+            document
+                .querySelector("#switch-previous-month-button")
+                .disabled = true
+
+            if (activeMonth === 0) return
+        }
+        else if (intention === 'next') {
+            document
+                .querySelector("#switch-next-month-button")
+                .disabled = true
+
+            if (activeMonth === Calendar.months.length -1) return
+        }
+
+        const switchMonth   = document.getElementById('switch-month')
+        const previousMonth = document.getElementById('previous-month')
+        const currentMonth  = document.getElementById('current-month')
+        const nextMonth     = document.getElementById('next-month')
+
+        const currentMonthAlignment   = (switchMonth.offsetWidth / 2) - (currentMonth.offsetWidth / 2)
+        currentMonth.style.transition = 'left 300ms ease-in-out, right 300ms ease-in-out, opacity 150ms linear'
+        currentMonth.style.opacity    = '0'
+
+        if (intention === 'previous') {
+            const previousMonthAlignment   = (switchMonth.offsetWidth / 2) - (previousMonth.offsetWidth / 2)
+            previousMonth.style.transition = 'left 300ms ease-in-out, opacity 150ms linear'
+            previousMonth.style.opacity    = '100'
+            previousMonth.style.left       = `${previousMonthAlignment}px`
+
+            currentMonth.style.left = `${currentMonthAlignment}px`
+        }
+        else if (intention === 'next') {
+            const alignmentNextMonth   = (switchMonth.offsetWidth / 2) - (nextMonth.offsetWidth / 2)
+            nextMonth.style.transition = 'right 300ms ease-in-out, opacity 150ms linear'
+            nextMonth.style.opacity    = '100'
+            nextMonth.style.right      = `${alignmentNextMonth}px`
+
+            currentMonth.style.right = `${currentMonthAlignment}px`
+        }
+
+        setTimeout(() => {
+            currentMonth.style.transition = 'none'
+            currentMonth.style.opacity    = '100'
+
+            if (intention === 'previous') {
+                previousMonth.style.transition = 'none'
+                previousMonth.style.opacity    = '0'
+                previousMonth.style.left       = '0'
+
+                currentMonth.style.left = '-50%'
+                Calendar.setActiveMonth(Calendar.activeMonth()-1)
+                DOM.updateCalendar()
+            }
+            else if (intention === 'next') {
+                nextMonth.style.transition = 'none'
+                nextMonth.style.opacity    = '0'
+                nextMonth.style.right      = '0'
+
+                currentMonth.style.right = '-50%'
+                Calendar.setActiveMonth(Calendar.activeMonth()+1)
+                DOM.updateCalendar()
+            }
+
+            if (activeMonth !== 1) {
+                document
+                    .querySelector("#switch-previous-month-button")
+                    .disabled = false
+            }
+            if (activeMonth === Calendar.months.length -1) {
+                document
+                    .querySelector("#switch-next-month-button")
+                    .disabled = false
+            }
+        }, 300)
+    }
+}
+
 const Storage = {
     get() {
         return JSON.parse(localStorage.getItem("dev.finances:transactions")) || []
     },
     getOpeningBalance() {
         return localStorage.getItem("dev.finances:openingBalance") || ""
+    },
+    getActiveMonth() {
+        return localStorage.getItem("dev.finances:activeMonth") || ""
     },
     set(transactions) {
         localStorage.setItem("dev.finances:transactions", JSON.stringify(transactions))
@@ -92,6 +196,9 @@ const Storage = {
     },
     setOpeningBalance(openingBalance) {
         localStorage.setItem("dev.finances:openingBalance", openingBalance)
+    },
+    setActiveMonth(month) {
+        localStorage.setItem("dev.finances:activeMonth", month)
     }
 }
 
@@ -158,7 +265,6 @@ const DOM = {
         tr.innerHTML = DOM.innerHTMLTransaction(transactions, index)
         tr.classList.add(`${deposit}`)
         tr.dataset.index = index
-        // tr.onclick = () => UpdateTransactionModal.open(index)
 
         DOM.transactionsContainer.appendChild(tr)
     },
@@ -211,6 +317,38 @@ const DOM = {
         document
             .querySelector("#totalDisplay")
             .innerHTML = Utils.formatCurrency(Transaction.total())
+    },
+    updateCalendar() {
+        const activeMonth = Calendar.activeMonth()
+
+        const previousMonth = activeMonth - 1
+        const nextMonth     = activeMonth + 1
+
+        let disabledPreviousMonth = false
+        if (activeMonth === 0) disabledPreviousMonth = true
+
+        let disabledNextMonth = false
+        if (activeMonth === Calendar.months.length -1) disabledNextMonth = true
+
+        document
+            .querySelector("#switch-previous-month-button")
+            .disabled = disabledPreviousMonth
+        document
+            .querySelector("#previous-month")
+            .innerHTML = disabledPreviousMonth ? '' : Calendar.months[previousMonth]
+        document
+            .querySelector("#current-month")
+            .innerHTML = Calendar.months[activeMonth]
+        document
+            .querySelector("#next-month")
+            .innerHTML = disabledNextMonth ? '' : Calendar.months[nextMonth]
+        document
+            .querySelector("#switch-next-month-button")
+            .disabled = disabledNextMonth
+        document
+            .querySelector("#year-calendar")
+            .innerHTML = new Date().getFullYear()
+
     },
     totalCardColor(){
         if (Transaction.total() < 0) {
@@ -438,6 +576,7 @@ const App = {
          ou ↓ */
         Transaction.all.forEach(DOM.addTransaction)
 
+        DOM.updateCalendar()        // Atualiza o mês ativo
         DOM.updateOpeningBalance()  // Atualiza o valor do saldo inicial
         DOM.updateBalance()         // Atualiza o valor dos cards
         DOM.totalCardColor()        // Atualiza a cor do card 'total'
