@@ -92,12 +92,32 @@ button:hover {
 
 
 
-/* Balance */
-#opening-balance {
+/* Calendar and Balance */
+#container-calendar-and-opening-balance {
     margin-bottom: 1.5rem;
 
+    position: relative;
+
     display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
     justify-content: center;
+    gap: 1rem;
+}
+#container-calendar-and-opening-balance h3#year-calendar {
+    background: linear-gradient(180deg, #2ECC71 0%, #294D38 100%);
+    border-radius: 0.5rem 0.5rem 0 0;
+    color: #E5E5E5;
+    font-size: 1rem;
+    font-weight: 600;
+
+    padding: 0 1rem 1rem 1rem;
+
+    position: absolute;
+    top: -1.5rem;
+    right: 0;
+
+    display: none;
 }
 #balance h2 {
     color: white;
@@ -110,7 +130,7 @@ button:hover {
 .mini-card {
     width: fit-content;
 
-    background-color: #2ecc7129;
+    background-color: #296241;
     border: 3px solid #2ecc71;
     color: #2ecc71;
 
@@ -218,11 +238,15 @@ table tbody tr {
 table tbody tr:hover {
     opacity: 1;
 }
-tr.deposit-not-activated {
-    background-color: #f9f9f9;
-    box-shadow: inset 0px 0px 0px 1px rgb(232 63 91 / 50%);
+table tbody tr.deposit-activated td {
+    background-color: #D6FFE7;
     border-radius: 0.25rem;
 }
+tr.deposit-not-activated {
+    background-color: #FFE4E9;
+    border-radius: 0.25rem;
+}
+tr.deposit-activated td,
 tr.deposit-not-activated td {
     background-color: transparent;
 }

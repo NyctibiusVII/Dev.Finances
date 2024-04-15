@@ -69,46 +69,179 @@ const CardColor = {
     }
 }
 
+const Calendar = {
+    months: [
+        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ],
+    activeMonth() {
+        let month = Storage.getActiveMonth()
+
+        if (!month) {
+            month = new Date().getMonth()
+            Storage.setActiveMonth(month)
+        }
+
+        return Number(month)
+    },
+    setActiveMonth(month) {
+        Storage.setActiveMonth(month)
+    },
+    switchMonth(intention) {
+        if (intention !== 'previous' && intention !== 'next') return
+
+        const activeMonth = Calendar.activeMonth()
+
+        if (intention === 'previous') {
+            document
+                .querySelector("#switch-previous-month-button")
+                .disabled = true
+
+            if (activeMonth === 0) return
+        }
+        else if (intention === 'next') {
+            document
+                .querySelector("#switch-next-month-button")
+                .disabled = true
+
+            if (activeMonth === Calendar.months.length -1) return
+        }
+
+        const switchMonth   = document.getElementById('switch-month')
+        const previousMonth = document.getElementById('previous-month')
+        const currentMonth  = document.getElementById('current-month')
+        const nextMonth     = document.getElementById('next-month')
+
+        const currentMonthAlignment   = (switchMonth.offsetWidth / 2) - (currentMonth.offsetWidth / 2)
+        currentMonth.style.transition = 'left 300ms ease-in-out, right 300ms ease-in-out, opacity 150ms linear'
+        currentMonth.style.opacity    = '0'
+
+        if (intention === 'previous') {
+            const previousMonthAlignment   = (switchMonth.offsetWidth / 2) - (previousMonth.offsetWidth / 2)
+            previousMonth.style.transition = 'left 300ms ease-in-out, opacity 150ms linear'
+            previousMonth.style.opacity    = '100'
+            previousMonth.style.left       = `${previousMonthAlignment}px`
+
+            currentMonth.style.left = `${currentMonthAlignment}px`
+        }
+        else if (intention === 'next') {
+            const alignmentNextMonth   = (switchMonth.offsetWidth / 2) - (nextMonth.offsetWidth / 2)
+            nextMonth.style.transition = 'right 300ms ease-in-out, opacity 150ms linear'
+            nextMonth.style.opacity    = '100'
+            nextMonth.style.right      = `${alignmentNextMonth}px`
+
+            currentMonth.style.right = `${currentMonthAlignment}px`
+        }
+
+        setTimeout(() => {
+            currentMonth.style.transition = 'none'
+            currentMonth.style.opacity    = '100'
+
+            if (intention === 'previous') {
+                previousMonth.style.transition = 'none'
+                previousMonth.style.opacity    = '0'
+                previousMonth.style.left       = '0'
+
+                currentMonth.style.left = '-50%'
+                Calendar.setActiveMonth(Calendar.activeMonth()-1)
+                DOM.updateCalendar()
+            }
+            else if (intention === 'next') {
+                nextMonth.style.transition = 'none'
+                nextMonth.style.opacity    = '0'
+                nextMonth.style.right      = '0'
+
+                currentMonth.style.right = '-50%'
+                Calendar.setActiveMonth(Calendar.activeMonth()+1)
+                DOM.updateCalendar()
+            }
+
+            if (activeMonth !== 1) {
+                document
+                    .querySelector("#switch-previous-month-button")
+                    .disabled = false
+            }
+            if (activeMonth === Calendar.months.length -1) {
+                document
+                    .querySelector("#switch-next-month-button")
+                    .disabled = false
+            }
+
+            App.reload()
+        }, 300)
+    }
+}
+
 const Storage = {
     get() {
-        return JSON.parse(localStorage.getItem("dev.finances:transactions")) || []
+        const transactions = JSON.parse(localStorage.getItem("dev.finances:transactions"))
+
+        if (!transactions) {
+            let newTransactions = []
+
+            for (let index = 0; index < 12; index++) {
+                newTransactions.push({
+                    monthIndex: index,
+                    transactions: [],
+                    incomes: 0,
+                    expanses: 0,
+                    total: 0,
+                    openingBalance: 0
+                })
+            }
+            return newTransactions
+        }
+
+        return transactions
+    },
+    getTransactions(monthIndex)  {
+        return Storage.get()[monthIndex].transactions
     },
     getOpeningBalance() {
         return localStorage.getItem("dev.finances:openingBalance") || ""
     },
+    getActiveMonth() {
+        return localStorage.getItem("dev.finances:activeMonth") || ""
+    },
     set(transactions) {
         localStorage.setItem("dev.finances:transactions", JSON.stringify(transactions))
     },
-    update(index, transaction) {
-        let transactionList = Transaction.all
+    update(transactionIndex, transaction, monthIndex) {
+        let transactionsList = Storage.get()
+        let transactions = Storage.getTransactions(monthIndex)
 
-        if (transactionList) {
-            if (transactionList[index]) {
-                transactionList[index] = transaction
+        if (transactions) {
+            if (transactions[transactionIndex]) {
+                transactions[transactionIndex] = transaction
             }
         }
-
-        Transaction.set(transactionList)
+        transactionsList[monthIndex].transactions = transactions
+        Transaction.set(transactionsList)
     },
     setOpeningBalance(openingBalance) {
         localStorage.setItem("dev.finances:openingBalance", openingBalance)
+    },
+    setActiveMonth(month) {
+        localStorage.setItem("dev.finances:activeMonth", month)
     }
 }
 
 const Transaction = {
     all: Storage.get(),
-    add(transaction) {
-        Transaction.all.push(transaction)
+    add(transaction, monthIndex) {
+        let transactionsList = Storage.get()
+        transactionsList[monthIndex].transactions.push(transaction)
+        Transaction.set(transactionsList)
 
-        App.reload()
+        App.reload(true)
     },
     set(transactions) {
         Storage.set(transactions)
     },
-    update(index, transaction) {
-        Storage.update(index, transaction)
+    update(modalIndex, transaction, monthIndex) {
+        Storage.update(modalIndex, transaction, monthIndex)
 
-        App.reload()
+        App.reload(true)
     },
     addOpeningBalance(openingBalance) {
         Storage.setOpeningBalance(openingBalance.amount)
@@ -116,14 +249,18 @@ const Transaction = {
         App.reload()
     },
     remove(index) {
-        Transaction.all.splice(index, 1)
+        const monthIndex = Calendar.activeMonth()
+        let transactionsList = Storage.get()
+        transactionsList[monthIndex].transactions.splice(index, 1)
+        Transaction.set(transactionsList)
 
-        App.reload()
+        App.reload(true)
     },
     incomes() { // Somar entradas
+        const monthIndex = Calendar.activeMonth()
         let income = 0
 
-        Transaction.all.forEach(transaction => {
+        Storage.getTransactions(monthIndex).forEach(transaction => {
             if (transaction.deposit) {
                 if (transaction.amount > 0) {
                     income += transaction.amount
@@ -133,9 +270,10 @@ const Transaction = {
         return income
     },
     expenses() { // Somar saídas
+        const monthIndex = Calendar.activeMonth()
         let expense = 0
 
-        Transaction.all.forEach(transaction => {
+        Storage.getTransactions(monthIndex).forEach(transaction => {
             if (transaction.deposit) {
                 if (transaction.amount < 0) {
                     expense += transaction.amount
@@ -144,8 +282,16 @@ const Transaction = {
         })
         return expense
     },
-    total() { // Entradas menos saídas mais saldo inicial
-        return Transaction.incomes() + Transaction.expenses() + Number(Storage.getOpeningBalance())
+    total(allValues=false) { // Entradas menos saídas mais saldo inicial
+        const incomes = Transaction.incomes()
+        const expenses = Transaction.expenses()
+        const openingBalance = Number(Storage.getOpeningBalance())
+
+        const total = incomes + expenses + openingBalance
+
+        if (!allValues) return total
+
+        return {incomes, expenses, total, openingBalance}
     }
 }
 
@@ -158,7 +304,6 @@ const DOM = {
         tr.innerHTML = DOM.innerHTMLTransaction(transactions, index)
         tr.classList.add(`${deposit}`)
         tr.dataset.index = index
-        // tr.onclick = () => UpdateTransactionModal.open(index)
 
         DOM.transactionsContainer.appendChild(tr)
     },
@@ -176,9 +321,9 @@ const DOM = {
         `
         return html
     },
-    updateTransactionModal(index) {
-        const {description, amount, date, deposit} = Transaction.all[index]
-        console.log(date)
+    updateTransactionModal(modalIndex) {
+        const monthIndex = Calendar.activeMonth()
+        const {description, amount, date, deposit} = Storage.getTransactions(monthIndex)[modalIndex]
 
         document
             .querySelector("#update-description")
@@ -202,24 +347,58 @@ const DOM = {
             .value = Utils.formatSimpleAmountToText(Storage.getOpeningBalance())
     },
     updateBalance() {
+        const {incomes, expenses, total} = Transaction.total(true)
         document
             .querySelector("#incomeDisplay")
-            .innerHTML = Utils.formatCurrency(Transaction.incomes())
+            .innerHTML = Utils.formatCurrency(incomes)
         document
             .querySelector("#expenseDisplay")
-            .innerHTML = Utils.formatCurrency(Transaction.expenses())
+            .innerHTML = Utils.formatCurrency(expenses)
         document
             .querySelector("#totalDisplay")
-            .innerHTML = Utils.formatCurrency(Transaction.total())
+            .innerHTML = Utils.formatCurrency(total)
+    },
+    updateCalendar() {
+        const activeMonth = Calendar.activeMonth()
+
+        const previousMonth = activeMonth - 1
+        const nextMonth     = activeMonth + 1
+
+        let disabledPreviousMonth = false
+        if (activeMonth === 0) disabledPreviousMonth = true
+
+        let disabledNextMonth = false
+        if (activeMonth === Calendar.months.length -1) disabledNextMonth = true
+
+        document
+            .querySelector("#switch-previous-month-button")
+            .disabled = disabledPreviousMonth
+        document
+            .querySelector("#previous-month")
+            .innerHTML = disabledPreviousMonth ? '' : Calendar.months[previousMonth]
+        document
+            .querySelector("#current-month")
+            .innerHTML = Calendar.months[activeMonth]
+        document
+            .querySelector("#next-month")
+            .innerHTML = disabledNextMonth ? '' : Calendar.months[nextMonth]
+        document
+            .querySelector("#switch-next-month-button")
+            .disabled = disabledNextMonth
+        document
+            .querySelector("#year-calendar")
+            .innerHTML = new Date().getFullYear()
+
     },
     totalCardColor(){
-        if (Transaction.total() < 0) {
+        const total = Transaction.total()
+        if (total < 0) {
             // - Negativo
-            console.info("Seu Valor Total Esta Negativo: " + Utils.formatSimple(Transaction.total()))
+            console.info("Seu Valor Total Esta Negativo: " + Utils.formatSimple(total))
             CardColor.negative()
         } else {
             // - Positivo
-            console.info("Seu Valor Total Esta Positivo: " + Utils.formatSimple(Transaction.total()))
+            console.info("Seu Valor Total Esta Positivo: " + Utils.formatSimple(total))
             CardColor.positive()
         }
     },
@@ -308,8 +487,8 @@ const Form = {
             deposit
         }
     },
-    saveTransaction(transaction) {
-        Transaction.add(transaction)
+    saveTransaction(transaction, monthIndex) {
+        Transaction.add(transaction, monthIndex)
     },
     clearFields() {
         Form.description.value = ""
@@ -321,12 +500,13 @@ const Form = {
         event.preventDefault()
 
         try {
-            Form.validateFields()                   // Verifica campos
-            const transaction = Form.formatValues() // Formata valores
-            Form.saveTransaction(transaction)       // Adiciona valores
-            Form.clearFields()                      // Limpa campos
+            Form.validateFields()                          // Verifica campos
+            const transaction = Form.formatValues()        // Formata valores
+            const monthIndex = Calendar.activeMonth()      // Pega mês ativo
+            Form.saveTransaction(transaction, monthIndex)  // Adiciona valores
+            Form.clearFields()                             // Limpa campos
 
-            Modal.close()                           // Fecha modal
+            Modal.close()                                  // Fecha modal
         } catch (error) {
             console.warn(error.message)
             toastError(error.message)
@@ -367,8 +547,8 @@ const UpdateTransactionForm = {
             deposit
         }
     },
-    saveTransaction(index, transaction) {
-        Transaction.update(index, transaction)
+    saveTransaction(modalIndex, transaction, monthIndex) {
+        Transaction.update(modalIndex, transaction, monthIndex)
     },
     submit(event) {
         event.preventDefault()
@@ -377,10 +557,11 @@ const UpdateTransactionForm = {
             .getAttribute("aria-modal-index")
 
         try {
-            UpdateTransactionForm.validateFields()                         // Verifica campos
-            const transaction = UpdateTransactionForm.formatValues()       // Formata valores
-            UpdateTransactionForm.saveTransaction(modalIndex, transaction) // Adiciona valores
-            UpdateTransactionModal.close()                                 // Fecha modal
+            UpdateTransactionForm.validateFields()                                      // Verifica campos
+            const transaction = UpdateTransactionForm.formatValues()                    // Formata valores
+            const monthIndex = Calendar.activeMonth()                                   // Pega mês ativo
+            UpdateTransactionForm.saveTransaction(modalIndex, transaction, monthIndex)  // Adiciona valores
+            UpdateTransactionModal.close()                                              // Fecha modal
         } catch (error) {
             console.warn(error.message)
             toastError(error.message)
@@ -431,26 +612,28 @@ const OpeningBalanceForm = {
 
 
 const App = {
-    init() {
-        /* Transaction.all.forEach((transactions, index) => {
-            DOM.addTransaction(transactions, index)
-        })
-         ou ↓ */
-        Transaction.all.forEach(DOM.addTransaction)
+    initAll() {
+        App.initDOM()
 
+        Storage.setOpeningBalance(Storage.getOpeningBalance())
+        Storage.set(Storage.get())
+    },
+    initDOM() {
+        Storage.getTransactions(Calendar.activeMonth())
+            .forEach((transactions, index) => DOM.addTransaction(transactions, index))
+
+        DOM.updateCalendar()        // Atualiza o mês ativo
         DOM.updateOpeningBalance()  // Atualiza o valor do saldo inicial
         DOM.updateBalance()         // Atualiza o valor dos cards
         DOM.totalCardColor()        // Atualiza a cor do card 'total'
-
-        Storage.setOpeningBalance(Storage.getOpeningBalance())
-        Storage.set(Transaction.all)
     },
-    reload() {
+    reload(DOMOnly=false) {
         DOM.clearTransactions()
-        App.init()
+        if (DOMOnly) return App.initDOM()
+        App.initAll()
     }
 }
-App.init()
+App.initAll()
 
 
 
