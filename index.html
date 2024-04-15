@@ -114,7 +114,7 @@
             <div id="form">
                 <h2>Nova Transação</h2>
 
-                <form action="" onsubmit="Form.submit(event)">
+                <form onsubmit="Form.submit(event)">
                     <div class="input-group">
                         <label for="description" class="sr-only">Descrição</label>
                         <input type="text" id="description" name="description" placeholder="Descrição">
@@ -144,7 +144,7 @@
                     </div>
 
                     <div class="input-group actions">
-                        <a href="#" onclick="Modal.close()" class="button cancel">Cancelar</a>
+                        <a onclick="Modal.close()" class="button cancel">Cancelar</a>
                         <button type="submit">Salvar</button>
                     </div>
                 </form>
@@ -157,7 +157,7 @@
             <div id="form">
                 <h2>Atualizar Transação</h2>
 
-                <form id="update-transaction-form" action="" aria-modal-index="" onsubmit="UpdateTransactionForm.submit(event)">
+                <form id="update-transaction-form" aria-modal-index="" onsubmit="UpdateTransactionForm.submit(event)">
                     <div class="input-group">
                         <label for="update-description" class="sr-only">Descrição</label>
                         <input type="text" id="update-description" name="update-description" placeholder="Descrição">
@@ -187,7 +187,7 @@
                     </div>
 
                     <div class="input-group actions">
-                        <a href="#" onclick="UpdateTransactionModal.close()" class="button cancel">Cancelar</a>
+                        <a onclick="UpdateTransactionModal.close()" class="button cancel">Cancelar</a>
                         <button type="submit">Salvar</button>
                     </div>
                 </form>
@@ -200,7 +200,7 @@
             <div id="form">
                 <h2>Alterar saldo inicial</h2>
 
-                <form action="" onsubmit="OpeningBalanceForm.submit(event)">
+                <form onsubmit="OpeningBalanceForm.submit(event)">
                     <br>
 
                     <div class="input-group">
@@ -212,7 +212,7 @@
 
                     <br><br>
                     <div class="input-group actions">
-                        <a href="#" onclick="OpeningBalanceModal.close()" class="button cancel">Cancelar</a>
+                        <a onclick="OpeningBalanceModal.close()" class="button cancel">Cancelar</a>
                         <button type="submit">Salvar</button>
                     </div>
                 </form>
@@ -225,7 +225,7 @@
         <div class="description">Por favor, preencha todos os campos!</div>
     </div>
 
-    <a href="#" onclick="Modal.open()" class="add-transaction-button">
+    <a onclick="Modal.open()" class="add-transaction-button">
         <img src="./assets/float-plus.svg" alt="Adicionar" width="16px">
     </a>
 
