@@ -534,6 +534,17 @@ const Form = {
     saveTransaction(transaction, monthIndex) {
         Transaction.add(transaction, monthIndex)
     },
+    getDataByTransaction(date) {
+        const cleanedDate  = String(date).replace(/\D/g, "")
+        let monthIndex = cleanedDate.substring(2, 4)
+
+        if (monthIndex.charAt(0) === '0') {
+            monthIndex = monthIndex.substring(1) // Remove o primeiro caractere "0"
+            monthIndex = String(Number(monthIndex) - 1)
+        }
+
+        return monthIndex
+    },
     clearFields() {
         Form.description.value = ""
         Form.amount.value      = ""
@@ -544,13 +555,13 @@ const Form = {
         event.preventDefault()
 
         try {
-            Form.validateFields()                          // Verifica campos
-            const transaction = Form.formatValues()        // Formata valores
-            const monthIndex = Calendar.activeMonth()      // Pega mês ativo
-            Form.saveTransaction(transaction, monthIndex)  // Adiciona valores
-            Form.clearFields()                             // Limpa campos
+            Form.validateFields()                                          // Verifica campos
+            const transaction = Form.formatValues()                        // Formata valores
+            const monthIndex = Form.getDataByTransaction(transaction.date) // Pega mês da transação
+            Form.saveTransaction(transaction, monthIndex)                  // Adiciona valores
+            Form.clearFields()                                             // Limpa campos
 
-            Modal.close()                                  // Fecha modal
+            Modal.close()                                                  // Fecha modal
         } catch (error) {
             console.warn(error.message)
             toastError(error.message)
