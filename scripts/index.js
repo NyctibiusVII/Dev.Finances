@@ -47,25 +47,49 @@ const OpeningBalanceModal = {
 }
 
 const CardColor = {
-    positive() {
-        document
-            .querySelector(".card.total")
-            .classList
-            .remove("negative")
-        document
-            .querySelector(".card.total")
-            .classList
-            .add("positive")
+    totalMonth: {
+        positive() {
+            document
+                .querySelector(".card.total-month")
+                .classList
+                .remove("negative")
+            document
+                .querySelector(".card.total-month")
+                .classList
+                .add("positive")
+        },
+        negative() {
+            document
+                .querySelector(".card.total-month")
+                .classList
+                .remove("positive")
+            document
+                .querySelector(".card.total-month")
+                .classList
+                .add("negative")
+        }
     },
-    negative() {
-        document
-            .querySelector(".card.total")
-            .classList
-            .remove("positive")
-        document
-            .querySelector(".card.total")
-            .classList
-            .add("negative")
+    totalBalance: {
+        positive() {
+            document
+                .querySelector(".card.total-balance")
+                .classList
+                .remove("negative")
+            document
+                .querySelector(".card.total-balance")
+                .classList
+                .add("positive")
+        },
+        negative() {
+            document
+                .querySelector(".card.total-balance")
+                .classList
+                .remove("positive")
+            document
+                .querySelector(".card.total-balance")
+                .classList
+                .add("negative")
+        }
     }
 }
 
@@ -182,11 +206,8 @@ const Storage = {
             for (let index = 0; index < 12; index++) {
                 newTransactions.push({
                     monthIndex: index,
-                    transactions: [],
-                    incomes: 0,
-                    expanses: 0,
-                    total: 0,
-                    openingBalance: 0
+                    totalMonth: 0,
+                    transactions: []
                 })
             }
             return newTransactions
@@ -282,16 +303,37 @@ const Transaction = {
         })
         return expense
     },
-    total(allValues=false) { // Entradas menos saídas mais saldo inicial
-        const incomes = Transaction.incomes()
-        const expenses = Transaction.expenses()
+    totalMonth(allValues=false) {
+        const monthIndex = Calendar.activeMonth()
         const openingBalance = Number(Storage.getOpeningBalance())
 
-        const total = incomes + expenses + openingBalance
+        const incomes = Transaction.incomes()
+        const expenses = Transaction.expenses()
 
-        if (!allValues) return total
+        const totalIE = incomes + expenses
+        const totalIEWithOpeningBalance = incomes + expenses + openingBalance
+        const totalMonth = totalIEWithOpeningBalance
 
-        return {incomes, expenses, total, openingBalance}
+        let transactionsList = Storage.get()
+        transactionsList[monthIndex].totalMonth = totalIE
+        Transaction.set(transactionsList)
+
+        if (!allValues) return totalMonth
+        return {incomes, expenses, totalMonth, openingBalance}
+    },
+    totalBalance() {
+        const monthIndex = Calendar.activeMonth()
+        const openingBalance = Number(Storage.getOpeningBalance())
+
+        let transactionsList = Storage.get()
+        let totalBalance = 0 + openingBalance
+
+        for (let index = 0; index <= monthIndex; index++) {
+            const totalMonth = transactionsList[index].totalMonth
+            totalBalance += totalMonth
+        }
+
+        return totalBalance
     }
 }
 
@@ -347,7 +389,9 @@ const DOM = {
             .value = Utils.formatSimpleAmountToText(Storage.getOpeningBalance())
     },
     updateBalance() {
-        const {incomes, expenses, total} = Transaction.total(true)
+        const {incomes, expenses, totalMonth} = Transaction.totalMonth(true)
+        const totalBalance = Transaction.totalBalance()
+
         document
             .querySelector("#incomeDisplay")
             .innerHTML = Utils.formatCurrency(incomes)
@@ -355,8 +399,11 @@ const DOM = {
             .querySelector("#expenseDisplay")
             .innerHTML = Utils.formatCurrency(expenses)
         document
-            .querySelector("#totalDisplay")
-            .innerHTML = Utils.formatCurrency(total)
+            .querySelector("#totalMonthDisplay")
+            .innerHTML = Utils.formatCurrency(totalMonth)
+        document
+            .querySelector("#totalBalanceDisplay")
+            .innerHTML = Utils.formatCurrency(totalBalance)
     },
     updateCalendar() {
         const activeMonth = Calendar.activeMonth()
@@ -391,16 +438,13 @@ const DOM = {
 
     },
     totalCardColor(){
-        const total = Transaction.total()
-        if (total < 0) {
-            // - Negativo
-            console.info("Seu Valor Total Esta Negativo: " + Utils.formatSimple(total))
-            CardColor.negative()
-        } else {
-            // - Positivo
-            console.info("Seu Valor Total Esta Positivo: " + Utils.formatSimple(total))
-            CardColor.positive()
-        }
+        const totalOfMonth = Transaction.totalMonth()
+        if (totalOfMonth < 0) CardColor.totalMonth.negative()
+        else CardColor.totalMonth.positive()
+
+        const totalOfBalance = Transaction.totalBalance()
+        if (totalOfBalance < 0) CardColor.totalBalance.negative()
+        else CardColor.totalBalance.positive()
     },
     clearTransactions(){
         DOM.transactionsContainer.innerHTML = ""
