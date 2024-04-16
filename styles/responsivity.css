@@ -4,9 +4,11 @@
     }
     #balance {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        /*ou grid-template-columns: 1fr 1fr 1fr;*/
-        gap: 2rem;/*Espaçamento entre ...*/
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+    }
+    #balance .card {
+        margin-bottom: 3rem;
     }
     div#toast {
         font-size: 14px;

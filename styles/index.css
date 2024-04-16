@@ -160,15 +160,15 @@ button:hover {
 .card {
     color: var(--dark-blue);
     background: white;
+    border-radius: 0.5rem;
 
-    padding: 1.5rem 2rem;
-    margin-bottom: 3rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
 
-    border-radius: 0.25rem;
-    -webkit-border-radius: 0.25rem;
-    -moz-border-radius: 0.25rem;
-    -ms-border-radius: 0.25rem;
-    -o-border-radius: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;
 }
 .card h3 {
     font-weight: normal;
@@ -178,20 +178,21 @@ button:hover {
     align-items: center;
     justify-content: space-between;
 }
+.card h3 img {
+    width: 1.125rem;
+}
 .card p {
     font-weight: normal;
-    font-size: 2rem;
-    line-height: 3rem;
-
-    margin-top: 1rem;
+    font-size: 1.5rem;
 }
-.card.total {
+.card.total-month,
+.card.total-balance {
     color: white;
 }
-.card.total.positive {
+.card.positive {
     background: var(--normal-green);
 }
-.card.total.negative {
+.card.negative {
     background: var(--normal-red);
 }
 
