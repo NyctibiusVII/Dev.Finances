@@ -1,0 +1,54 @@
+.menu-button {
+    width: 4rem;
+    height: 4rem;
+
+    background-color: var(--dark-green);
+
+    right: 1rem;
+    bottom: 1rem;
+
+    z-index: 20;
+}
+.menu-button,
+.menu-options {
+    color: white;
+    /* box-shadow: 2px 2px 3px var(--shadow); */
+    border-radius: 100%;
+
+    text-align: center;
+
+    position: fixed;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.menu-button:hover{
+    background: var(--normal-green);
+
+    transition: background-color .3s;
+}
+
+.menu-options {
+    width: 2.5rem;
+    height: 2.5rem;
+
+    background: var(--normal-green);
+    border: 1px solid #ffffff80;
+
+    right: 2rem;
+    bottom: 2rem;
+
+    z-index: 10;
+}
+.menu-options:hover {
+    background: var(--dark-green);
+
+    transition: background-color .3s;
+}
+.add-transaction-button.active {
+    bottom: 9rem;
+}
+.add-category-button.active {
+    bottom: 6rem;
+}

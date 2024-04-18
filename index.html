@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="./styles/index.css">
     <link rel="stylesheet" href="./styles/modal.css">
     <link rel="stylesheet" href="./styles/form-modal.css">
-    <link rel="stylesheet" href="./styles/add-transaction-button.css">
+    <link rel="stylesheet" href="./styles/menu-float-button.css">
     <link rel="stylesheet" href="./styles/scrollbar.css">
     <link rel="stylesheet" href="./styles/toggle-switch.css">
     <link rel="stylesheet" href="./styles/switch-month.css">
@@ -105,6 +105,7 @@
                 <thead>
                     <tr>
                         <th>Descrição</th>
+                        <th>Categoria</th>
                         <th>Valor</th>
                         <th>Data</th>
                         <th></th>
@@ -116,15 +117,20 @@
         </section>
     </main>
 
-    <div class="modal-overlay">
+    <div id="create-transaction-modal" class="modal-overlay">
         <div class="modal">
             <div id="form">
                 <h2>Nova Transação</h2>
 
                 <form onsubmit="Form.submit(event)">
-                    <div class="input-group">
-                        <label for="description" class="sr-only">Descrição</label>
-                        <input type="text" id="description" name="description" placeholder="Descrição">
+                    <div class="input-container">
+                        <div class="input-group">
+                            <select id="category" name="category"></select>
+                        </div>
+                        <div class="input-group">
+                            <label for="description" class="sr-only">Descrição</label>
+                            <input type="text" id="description" name="description" placeholder="Descrição">
+                        </div>
                     </div>
 
                     <div class="input-group">
@@ -151,7 +157,7 @@
                     </div>
 
                     <div class="input-group actions">
-                        <a onclick="Modal.close()" class="button cancel">Cancelar</a>
+                        <a onclick="CreateTransactionModal.close()" class="button cancel">Cancelar</a>
                         <button type="submit">Salvar</button>
                     </div>
                 </form>
@@ -165,9 +171,14 @@
                 <h2>Atualizar Transação</h2>
 
                 <form id="update-transaction-form" aria-modal-index="" onsubmit="UpdateTransactionForm.submit(event)">
-                    <div class="input-group">
-                        <label for="update-description" class="sr-only">Descrição</label>
-                        <input type="text" id="update-description" name="update-description" placeholder="Descrição">
+                    <div class="input-container">
+                        <div class="input-group">
+                            <select id="update-category" name="update-category"></select>
+                        </div>
+                        <div class="input-group">
+                            <label for="update-description" class="sr-only">Descrição</label>
+                            <input type="text" id="update-description" name="update-description" placeholder="Descrição">
+                        </div>
                     </div>
 
                     <div class="input-group">
@@ -227,14 +238,53 @@
         </div>
     </div>
 
+    <div id="category-modal" class="modal-overlay">
+        <div class="modal">
+            <div id="form-create-category">
+                <h2>Criar Nova Categoria</h2>
+
+                <form onsubmit="CreateCategoryForm.submit(event)">
+                    <div class="input-group">
+                        <label for="create-category" class="sr-only">Categoria</label>
+                        <input type="text" id="create-category" name="create-category" placeholder="Categoria">
+                    </div>
+
+                    <button type="submit">Salvar</button>
+                </form>
+            </div>
+            <div id="form-delete-category">
+                <h2>Deletar Categoria</h2>
+
+                <div class="category-group"></div>
+
+                <form onsubmit="DeleteCategoryForm.submit(event)">
+                    <div class="input-group">
+                        <label for="delete-category" class="sr-only">Categoria</label>
+                        <input type="text" id="delete-category" name="delete-category" placeholder="Categoria">
+                    </div>
+
+                    <button type="submit">Deletar</button>
+                </form>
+            </div>
+
+            <button onclick="CategoryModal.close()" class="exit-x">X</button>
+        </div>
+    </div>
+
     <div id="toast">
         <div class="img"><h1>×</h1></div>
         <div class="description">Por favor, preencha todos os campos!</div>
     </div>
 
-    <a onclick="Modal.open()" class="add-transaction-button">
-        <img src="./assets/float-plus.svg" alt="Adicionar" width="16px">
-    </a>
+    <button onclick="MenuButton.toggle()" class="menu-button">
+        <img src="./assets/menu.svg" alt="Menu" width="32px">
+    </button>
+    <button onclick="CreateTransactionModal.open()" title="Adicionar nova transação" class="add-transaction-button menu-options">
+        <img src="./assets/transfer.svg" alt="Adicionar transação" width="16px">
+    </button>
+    <button onclick="CategoryModal.open()" title="Adicionar nova categoria" class="add-category-button menu-options">
+        <img src="./assets/category.svg" alt="Adicionar categoria" width="16px">
+    </button>
 
     <footer><small>© 2021 - dev.finance$</small></footer>
 

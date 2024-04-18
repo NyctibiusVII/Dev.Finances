@@ -1,9 +1,47 @@
-const Modal = {
+const MenuButton = {
+    toggle() {
+        document
+            .querySelector(".add-category-button")
+            .classList
+            .contains("active") ? MenuButton.close() : MenuButton.open()
+    },
+    open() {
+        const addTransactionButton = document.querySelector(".add-transaction-button")
+        const addCategoryButton = document.querySelector(".add-category-button")
+        addTransactionButton.classList.add("active")
+        addCategoryButton.classList.add("active")
+    },
+    close() {
+        const addTransactionButton = document.querySelector(".add-transaction-button")
+        const addCategoryButton = document.querySelector(".add-category-button")
+        addTransactionButton.classList.remove("active")
+        addCategoryButton.classList.remove("active")
+    }
+}
+const CategoryModal = {
+    open() {
+        document
+            .querySelector("#category-modal")
+            .classList
+            .add("active")
+
+        DOM.categoryModal()
+    },
+    close() {
+        document
+            .querySelector("#category-modal")
+            .classList
+            .remove("active")
+    }
+}
+const CreateTransactionModal = {
     open() {
         document
             .querySelector(".modal-overlay")
             .classList
             .add("active")
+
+        DOM.createTransactionModal()
     },
     close() {
         document
@@ -224,6 +262,9 @@ const Storage = {
     getActiveMonth() {
         return localStorage.getItem("dev.finances:activeMonth") || ""
     },
+    getCategories() {
+        return JSON.parse(localStorage.getItem("dev.finances:categories")) || ['lazer', 'carro', 'casa', 'trabalho']
+    },
     set(transactions) {
         localStorage.setItem("dev.finances:transactions", JSON.stringify(transactions))
     },
@@ -244,6 +285,16 @@ const Storage = {
     },
     setActiveMonth(month) {
         localStorage.setItem("dev.finances:activeMonth", month)
+    },
+    updateCategory(category) {
+        let categories = Storage.getCategories()
+        categories.push(category)
+        localStorage.setItem("dev.finances:categories", JSON.stringify(categories))
+    },
+    setCategory(category) {
+        let categories = Storage.getCategories()
+        categories = categories.filter(item => item !== category)
+        localStorage.setItem("dev.finances:categories", JSON.stringify(categories))
     }
 }
 
@@ -355,6 +406,7 @@ const DOM = {
         const UpdateTransactionModal_func = `UpdateTransactionModal.open(${index})`
         const html = `
         <td onClick="${UpdateTransactionModal_func}" class="description">${transactions.description}</td>
+        <td onClick="${UpdateTransactionModal_func}" class="description">${String(transactions.category)[0].toUpperCase() + String(transactions.category).substring(1)}</td>
         <td onClick="${UpdateTransactionModal_func}" class="${CSSclass}">${amount}</td>
         <td onClick="${UpdateTransactionModal_func}" class="date">${transactions.date}</td>
         <td onclick="Transaction.remove(${index})" class="center-item">
@@ -363,10 +415,63 @@ const DOM = {
         `
         return html
     },
+    categoryModal() {
+        const categoryGroup = document.querySelector(".category-group")
+        const categories = Storage.getCategories()
+
+        categoryGroup.innerHTML = ""
+        for (let index = 0; index < categories.length; index++) {
+            const category = categories[index]
+
+            const p = document.createElement("p")
+            p.value = category
+            p.innerHTML = category
+
+            categoryGroup.appendChild(p)
+        }
+    },
+    createTransactionModal() {
+        const select = document.querySelector("#category")
+        const categories = Storage.getCategories()
+
+        select.innerHTML = ""
+
+        const option = document.createElement("option")
+        option.value = '-1'
+        option.innerHTML = 'Selecione a categoria:'
+        select.appendChild(option)
+
+        for (let index = 0; index < categories.length; index++) {
+            const category = categories[index]
+
+            const option = document.createElement("option")
+            option.value = category
+            option.innerHTML = category
+
+            select.appendChild(option)
+        }
+    },
     updateTransactionModal(modalIndex) {
         const monthIndex = Calendar.activeMonth()
-        const {description, amount, date, deposit} = Storage.getTransactions(monthIndex)[modalIndex]
+        const {category, description, amount, date, deposit} = Storage.getTransactions(monthIndex)[modalIndex]
 
+        const select = document.querySelector("#update-category")
+        const categories = Storage.getCategories()
+
+        select.innerHTML = ""
+        for (let index = 0; index < categories.length; index++) {
+            const category = categories[index]
+
+            const option = document.createElement("option")
+            option.value = category
+            option.innerHTML = category
+
+            select.appendChild(option)
+        }
+
+        document
+            .querySelector("#update-category")
+            .value = category
         document
             .querySelector("#update-description")
             .value = description
@@ -499,12 +604,15 @@ const Utils = {
 }
 
 const Form = {
+    category:    document.querySelector("select#category"),
     description: document.querySelector("input#description"),
     amount:      document.querySelector("input#amount"),
     date:        document.querySelector("input#date"),
     deposit:     document.querySelector("input#deposit"),
     getValues() {
+
         return {
+            category:    Form.category.value,
             description: Form.description.value,
             amount:      Form.amount.value,
             date:        Form.date.value,
@@ -512,19 +620,20 @@ const Form = {
         }
     },
     validateFields() {
-        const {description, amount, date} = Form.getValues()
+        const {category, description, amount, date} = Form.getValues()
 
-        if (description.trim() === "" || amount.trim() === "" || date.trim() === "") {
+        if (category === '-1' || description.trim() === "" || amount.trim() === "" || date.trim() === "") {
             throw new Error("Por favor, preencha todos os campos!")
         }
     },
     formatValues() {
-        let {description, amount, date, deposit} = Form.getValues()
+        let {category, description, amount, date, deposit} = Form.getValues()
 
         amount = Utils.formatAmount(amount)
         date   = Utils.formatDate(date)
 
         return {
+            category,
             description,
             amount,
             date,
@@ -546,6 +655,7 @@ const Form = {
         return monthIndex
     },
     clearFields() {
+        Form.category.value    = "-1"
         Form.description.value = ""
         Form.amount.value      = ""
         Form.date.value        = ""
@@ -561,7 +671,7 @@ const Form = {
             Form.saveTransaction(transaction, monthIndex)                  // Adiciona valores
             Form.clearFields()                                             // Limpa campos
 
-            Modal.close()                                                  // Fecha modal
+            CreateTransactionModal.close()                                                  // Fecha modal
         } catch (error) {
             console.warn(error.message)
             toastError(error.message)
@@ -570,12 +680,14 @@ const Form = {
     }
 }
 const UpdateTransactionForm = {
+    category:    document.querySelector("select#update-category"),
     description: document.querySelector("input#update-description"),
     amount:      document.querySelector("input#update-amount"),
     date:        document.querySelector("input#update-date"),
     deposit:     document.querySelector("input#update-deposit"),
     getValues() {
         return {
+            category:    UpdateTransactionForm.category.value,
             description: UpdateTransactionForm.description.value,
             amount:      UpdateTransactionForm.amount.value,
             date:        UpdateTransactionForm.date.value,
@@ -583,19 +695,20 @@ const UpdateTransactionForm = {
         }
     },
     validateFields() {
-        const {description, amount, date} = UpdateTransactionForm.getValues()
+        const {category, description, amount, date} = UpdateTransactionForm.getValues()
 
-        if (description.trim() === "" || amount.trim() === "" || date.trim() === "") {
+        if (category === '-1' || description.trim() === "" || amount.trim() === "" || date.trim() === "") {
             throw new Error("Por favor, preencha todos os campos!")
         }
     },
     formatValues() {
-        let {description, amount, date, deposit} = UpdateTransactionForm.getValues()
+        let {category, description, amount, date, deposit} = UpdateTransactionForm.getValues()
 
         amount = Utils.formatAmount(amount)
         date   = Utils.formatDate(date)
 
         return {
+            category,
             description,
             amount,
             date,
@@ -664,7 +777,108 @@ const OpeningBalanceForm = {
         }
     }
 }
+const CreateCategoryForm = {
+    category: document.querySelector("input#create-category"),
+    getValues() {
+        return {
+            category: CreateCategoryForm.category.value
+        }
+    },
+    validateFields() {
+        let {category} = CreateCategoryForm.getValues()
 
+        if (category.trim() === "") {
+            throw new Error("Por favor, preencha o campo!")
+        }
+
+        category = String(category).toLowerCase()
+
+        let categories = Storage.getCategories()
+        if (categories.includes(category)) {
+            throw new Error("Esta categoria já existe, por favor preencha o campo com um valor diferente!")
+        }
+    },
+    formatValues() {
+        let {category} = CreateCategoryForm.getValues()
+
+        category = String(category).toLowerCase()
+
+        return category
+    },
+    saveCategory(category) {
+        Storage.updateCategory(category)
+    },
+    clearFields() {
+        CreateCategoryForm.category.value = ""
+    },
+    submit(event) {
+        event.preventDefault()
+
+        try {
+            CreateCategoryForm.validateFields()                    // Verifica campos
+            const category = CreateCategoryForm.formatValues()     // Formata valores
+            CreateCategoryForm.saveCategory(category)              // Adiciona valores
+            CreateCategoryForm.clearFields()                       // Limpa campos
+
+            CategoryModal.close()                            // Fecha modal
+        } catch (error) {
+            console.warn(error.message)
+            toastError(error.message)
+        }
+    }
+
+}
+const DeleteCategoryForm = {
+    category: document.querySelector("input#delete-category"),
+    getValues() {
+        return {
+            category: DeleteCategoryForm.category.value
+        }
+    },
+    validateFields() {
+        let {category} = DeleteCategoryForm.getValues()
+
+        if (category.trim() === "") {
+            throw new Error("Por favor, preencha o campo!")
+        }
+
+        category = String(category).toLowerCase()
+
+        let categories = Storage.getCategories()
+        if (!categories.includes(category)) {
+            throw new Error("Esta categoria não existe, por favor preencha o campo com um valor diferente!")
+        }
+    },
+    formatValues() {
+        let {category} = DeleteCategoryForm.getValues()
+
+        category = String(category).toLowerCase()
+
+        return category
+    },
+    saveCategory(category) {
+        Storage.setCategory(category)
+    },
+    clearFields() {
+        DeleteCategoryForm.category.value = ""
+    },
+    submit(event) {
+        event.preventDefault()
+
+        try {
+            DeleteCategoryForm.validateFields()                    // Verifica campos
+            const category = DeleteCategoryForm.formatValues()     // Formata valores
+            DeleteCategoryForm.saveCategory(category)              // Adiciona valores
+            DeleteCategoryForm.clearFields()                       // Limpa campos
+
+            CategoryModal.close()                                  // Fecha modal
+        } catch (error) {
+            console.warn(error.message)
+            toastError(error.message)
+        }
+    }
+
+}
 
 const App = {
     initAll() {
